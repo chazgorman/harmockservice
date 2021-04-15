@@ -76,22 +76,23 @@ namespace HarMockServer
                     }
 
                     // No match found, forward request to original api
+                    await httpContext.Response.WriteAsync("No mock response at that endpoint");
 
-                    try
-                    {
-                        await httpProxy.ProxyAsync(httpContext, _config.GetValue<string>("Api:Url"), httpClient);
+                    //try
+                    //{
+                    //    await httpProxy.ProxyAsync(httpContext, _config.GetValue<string>("Api:Url"), httpClient);
 
-                        // Log errors from forwarded request
-                        var errorFeature = httpContext.Features.Get<IProxyErrorFeature>();
-                        if (errorFeature != null)
-                        {
-                            logger.LogError(errorFeature.Exception, $"{errorFeature.Error}");
-                        }
-                    }
-                    catch(Exception ex)
-                    {
-                        logger.LogError(ex, $"{ex.Message}");
-                    }
+                    //    // Log errors from forwarded request
+                    //    var errorFeature = httpContext.Features.Get<IProxyErrorFeature>();
+                    //    if (errorFeature != null)
+                    //    {
+                    //        logger.LogError(errorFeature.Exception, $"{errorFeature.Error}");
+                    //    }
+                    //}
+                    //catch(Exception ex)
+                    //{
+                    //    logger.LogError(ex, $"{ex.Message}");
+                    //}
 
                 });
             });
