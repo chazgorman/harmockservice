@@ -76,14 +76,23 @@ namespace HarMockServer
                     }
 
                     // No match found, forward request to original api
-                    await httpProxy.ProxyAsync(httpContext, _config.GetValue<string>("Api:Url"), httpClient);
 
-                    // Log errors from forwarded request
-                    var errorFeature = httpContext.Features.Get<IProxyErrorFeature>();
-                    if (errorFeature != null)
+                    try
                     {
-                        logger.LogError(errorFeature.Exception, $"{errorFeature.Error}");
+                        await httpProxy.ProxyAsync(httpContext, _config.GetValue<string>("Api:Url"), httpClient);
+
+                        // Log errors from forwarded request
+                        var errorFeature = httpContext.Features.Get<IProxyErrorFeature>();
+                        if (errorFeature != null)
+                        {
+                            logger.LogError(errorFeature.Exception, $"{errorFeature.Error}");
+                        }
                     }
+                    catch(Exception ex)
+                    {
+                        logger.LogError(ex, $"{ex.Message}");
+                    }
+
                 });
             });
         }
