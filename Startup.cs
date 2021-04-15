@@ -64,13 +64,13 @@ namespace HarMockServer
                     {
                         logger.LogInformation($"Mocking API {new Uri(match.Request.Url).AbsolutePath}");
 
-                        foreach (var header in match.Response.Headers)
-                        {
-                            if (!new[] { "content-length", "content-encoding" }.Any(h =>  header.Name.ToLower() == h))
-                                httpContext.Response.Headers.TryAdd(header.Name, header.Value);
-                        }
+                        //foreach (var header in match.Response.Headers)
+                        //{
+                        //    if (!new[] { "content-length", "content-encoding" }.Any(h =>  header.Name.ToLower() == h))
+                        //        httpContext.Response.Headers.TryAdd(header.Name, header.Value);
+                        //}
 
-                        httpContext.Response.StatusCode = match.Response.Status;
+                        //httpContext.Response.StatusCode = match.Response.Status;
                         await httpContext.Response.WriteAsync(match.Response.Content.Text);
                         return;
                     }
