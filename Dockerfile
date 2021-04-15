@@ -8,7 +8,7 @@ EXPOSE 443
 FROM mcr.microsoft.com/dotnet/sdk:5.0-buster-slim AS build
 WORKDIR /src
 COPY ["HarMockServer.csproj", ""]
-ADD /HARS /app/HARS
+
 RUN dotnet restore "./HarMockServer.csproj"
 COPY . .
 WORKDIR "/src/."
@@ -19,5 +19,6 @@ RUN dotnet publish "HarMockServer.csproj" -c Release -o /app/publish
 
 FROM base AS final
 WORKDIR /app
+ADD HARS /app/HARS
 COPY --from=publish /app/publish .
 ENTRYPOINT ["dotnet", "HarMockServer.dll"]
