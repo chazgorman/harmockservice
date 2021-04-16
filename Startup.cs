@@ -70,14 +70,16 @@ namespace HarMockServer
                         //        httpContext.Response.Headers.TryAdd(header.Name, header.Value);
                         //}
 
-                        //httpContext.Response.StatusCode = match.Response.Status;
+                        httpContext.Response.StatusCode = 200;
                         await httpContext.Response.WriteAsync(match.Response.Content.Text);
                         return;
                     }
 
                     // No match found, forward request to original api
+                    httpContext.Response.StatusCode = 200;
                     await httpContext.Response.WriteAsync("No mock response at that endpoint");
 
+                    
                     //try
                     //{
                     //    await httpProxy.ProxyAsync(httpContext, _config.GetValue<string>("Api:Url"), httpClient);
