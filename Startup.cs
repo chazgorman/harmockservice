@@ -27,24 +27,20 @@ namespace HarMockServer
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddHttpProxy();
             services.AddSingleton<Mocks>();
         }
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IHttpProxy httpProxy)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
 
-            var httpClient = new HttpMessageInvoker(new SocketsHttpHandler()
-            {
-                UseProxy = false,
-                AllowAutoRedirect = false,
-                AutomaticDecompression = DecompressionMethods.None,
-                UseCookies = false
-            });
+            ServicePointManager.ServerCertificateValidationCallback +=
+                (sender, certificate, chain, errors) => {
+                    return true;
+                };
 
             app.UseRouting();
             app.UseEndpoints(endpoints =>
@@ -64,12 +60,6 @@ namespace HarMockServer
                     {
                         logger.LogInformation($"Mocking API {new Uri(match.Request.Url).AbsolutePath}");
 
-                        //foreach (var header in match.Response.Headers)
-                        //{
-                        //    if (!new[] { "content-length", "content-encoding" }.Any(h =>  header.Name.ToLower() == h))
-                        //        httpContext.Response.Headers.TryAdd(header.Name, header.Value);
-                        //}
-
                         httpContext.Response.StatusCode = 200;
                         await httpContext.Response.WriteAsync(match.Response.Content.Text);
                         return;
@@ -77,25 +67,7 @@ namespace HarMockServer
 
                     // No match found, forward request to original api
                     httpContext.Response.StatusCode = 200;
-                    await httpContext.Response.WriteAsync("No mock response at that endpoint");
-
-                    
-                    //try
-                    //{
-                    //    await httpProxy.ProxyAsync(httpContext, _config.GetValue<string>("Api:Url"), httpClient);
-
-                    //    // Log errors from forwarded request
-                    //    var errorFeature = httpContext.Features.Get<IProxyErrorFeature>();
-                    //    if (errorFeature != null)
-                    //    {
-                    //        logger.LogError(errorFeature.Exception, $"{errorFeature.Error}");
-                    //    }
-                    //}
-                    //catch(Exception ex)
-                    //{
-                    //    logger.LogError(ex, $"{ex.Message}");
-                    //}
-
+                    await httpContext.Response.WriteAsync("No mock response at that endpoint");                   
                 });
             });
         }
